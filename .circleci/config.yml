@@ -75,17 +75,23 @@ jobs:
     <<: *resource_class
     environment:
       TEXT: "Success: {{.CircleBuildUrl}} by {{.CircleUsername}}"
+      COLOR: "#33ad7f"
+      CHANNEL: general
+      TOPIC: "Build completed"
     steps:
-      - run: /bin/simpleslack -c "#33ad7f"
+      - run: /bin/simpleslack
   notify_failure:
     <<: *slack_image
     <<: *resource_class
     environment:
       TEXT: "Failure: {{.CircleBuildUrl}} by {{.CircleUsername}}"
+      COLOR: "#a1040c"
+      CHANNEL: general
+      TOPIC: "Build completed"
     steps:
       - run:
           name: Failure notification
-          command: /bin/simpleslack -c "#a1040c"
+          command: /bin/simpleslack
           when: on_fail
 
 workflows:

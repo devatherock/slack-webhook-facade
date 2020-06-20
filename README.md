@@ -19,9 +19,31 @@ To post a slack webhook message to zulip, use the slack webhook URL in the below
 https://slack-webhook-facade.herokuapp.com/zulip/Y2ktYm90QHp1bGlwY2hhdC5jb206eHl6?server=https://devatherock-chat.zulipchat.com
 ```
 
-#### URL Parameters
+#### Sample slack payload to post to the facade
+```json
+{
+  "text": "https://circleci.com/gh/devatherock/git-sync/66 by devatherock",
+  "channel": "general",
+  "attachments": [
+    {
+      "title": "Build completed",
+      "text": "https://circleci.com/gh/devatherock/git-sync/66 by devatherock",
+      "color": "#764FA5"
+    }
+  ]
+}
+```
+
+#### Parameters
+**Path parameters**
 - **slackWebhookFacadeHost** - Host name of your `slack-webhook-facade` instance
 - **base64(username:zulipApiKey)** - Base64 encoded value of the Zulip bot integration's username and API key, joined
 together by a colon. Will be used as the `Basic` authorization header in the call to Zulip API. If the username is
 `ci-bot@zulipchat.com` and the API key is `xyz`, the path variable will be what is in the sample URL
+
+**Query parameters**
 - **zulipHost** - Host name of your Zulip instance
+
+**Payload parameters**
+- **channel** - The Zulip `stream` to post the message to
+- **title** - The `topic` name in Zulip
