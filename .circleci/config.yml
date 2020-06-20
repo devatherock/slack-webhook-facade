@@ -77,7 +77,7 @@ jobs:
       TEXT: "Success: {{.CircleBuildUrl}} by {{.CircleUsername}}"
       COLOR: "#33ad7f"
       CHANNEL: general
-      TOPIC: "Build completed"
+      TITLE: "Build completed"
     steps:
       - run: /bin/simpleslack
   notify_failure:
@@ -87,7 +87,7 @@ jobs:
       TEXT: "Failure: {{.CircleBuildUrl}} by {{.CircleUsername}}"
       COLOR: "#a1040c"
       CHANNEL: general
-      TOPIC: "Build completed"
+      TITLE: "Build completed"
     steps:
       - run:
           name: Failure notification
