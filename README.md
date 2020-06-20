@@ -4,7 +4,7 @@
 [![Docker Image Layers](https://img.shields.io/microbadger/layers/devatherock/slack-webhook-facade.svg)](https://microbadger.com/images/devatherock/slack-webhook-facade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # slack-webhook-facade
-A Slack webhook facade to post messages to other chat clients like Zulip
+A Slack webhook facade to post messages to other chat clients like [Zulip](https://zulipchat.com/)
 
 ## Usage
 ### Zulip
