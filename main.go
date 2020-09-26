@@ -95,11 +95,11 @@ func ZulipHandler(writer http.ResponseWriter, request *http.Request) {
 
     client := &http.Client{}
     zulipResponse, error := client.Do(zulipRequest)
-	  if error != nil {
+    if error != nil {
         writeErrorResponse(writer, error, 500)
         return
-	  }
-	  defer zulipResponse.Body.Close()
+    }
+    defer zulipResponse.Body.Close()
     if(zulipResponse.StatusCode < 400) {
         log.Println("Message posted to Zulip with http status", zulipResponse.StatusCode)
     } else {
