@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/devatherock/slack-webhook-facade.svg?style=svg)](https://circleci.com/gh/devatherock/slack-webhook-facade)
+[![Version](https://img.shields.io/docker/v/devatherock/slack-webhook-facade?sort=date)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/devatherock/slack-webhook-facade.svg)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
 [![Docker Image Size](https://img.shields.io/docker/image-size/devatherock/slack-webhook-facade.svg?sort=date)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
 [![Docker Image Layers](https://img.shields.io/microbadger/layers/devatherock/slack-webhook-facade.svg)](https://microbadger.com/images/devatherock/slack-webhook-facade)
