@@ -1,2 +1,4 @@
 release/
 *.iml
+.project
+docker/slackwebhookfacade
