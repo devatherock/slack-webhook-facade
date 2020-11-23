@@ -1,9 +1,10 @@
 [![CircleCI](https://circleci.com/gh/devatherock/slack-webhook-facade.svg?style=svg)](https://circleci.com/gh/devatherock/slack-webhook-facade)
-[![Version](https://img.shields.io/docker/v/devatherock/slack-webhook-facade?sort=date)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
+[![Version](https://img.shields.io/docker/v/devatherock/slack-webhook-facade?sort=semver)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
+[![Coverage Status](https://coveralls.io/repos/github/devatherock/slack-webhook-facade/badge.svg?branch=master)](https://coveralls.io/github/devatherock/slack-webhook-facade?branch=master)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=slack-webhook-facade&metric=alert_status)](https://sonarcloud.io/component_measures?id=slack-webhook-facade&metric=alert_status&view=list)
 [![Docker Pulls](https://img.shields.io/docker/pulls/devatherock/slack-webhook-facade.svg)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=slack-webhook-facade&metric=ncloc)](https://sonarcloud.io/component_measures?id=slack-webhook-facade&metric=ncloc)
 [![Docker Image Size](https://img.shields.io/docker/image-size/devatherock/slack-webhook-facade.svg?sort=date)](https://hub.docker.com/r/devatherock/slack-webhook-facade/)
-[![Docker Image Layers](https://img.shields.io/microbadger/layers/devatherock/slack-webhook-facade.svg)](https://microbadger.com/images/devatherock/slack-webhook-facade)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # slack-webhook-facade
 A Slack webhook facade to post messages to other chat clients like [Zulip](https://zulipchat.com/)
 
