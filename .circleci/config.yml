@@ -1,12 +1,9 @@
 slack_image: &slack_image
   docker:
-    - image: devatherock/simple-slack:0.5.0
+    - image: devatherock/simple-slack:0.7.0
       auth:
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
-
-orbs:
-  heroku: circleci/heroku@1.0.1
 
 work_directory: &work_directory
   working_directory: ~/slack-webhook-facade
@@ -22,7 +19,14 @@ executors:
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
     <<: *resource_class
-    <<: *work_directory    
+    <<: *work_directory
+    
+release_filter: &release_filter
+  filters:
+    branches:
+      only: non-existent-branch
+    tags:
+      only: /^v[0-9\.]+$/    
 
 version: 2.1
 jobs:
@@ -32,8 +36,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
+            - v1-pkg-cache-{{ checksum "go.mod" }}
             - v1-pkg-cache
       - run: make check
+      
   build:
     executor: docker-executor
     environment:
@@ -43,6 +49,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
+            - v1-pkg-cache-{{ checksum "go.mod" }}
             - v1-pkg-cache
       - run: |
           make coveralls
@@ -50,7 +57,7 @@ jobs:
       - save_cache:
           paths:
             - "/go/pkg"
-          key: v1-pkg-cache
+          key: v1-pkg-cache-{{ checksum "go.mod" }}
       - persist_to_workspace:
           root: ~/slack-webhook-facade
           paths:
@@ -68,13 +75,11 @@ jobs:
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
           docker build -t devatherock/slack-webhook-facade:$TAG docker
           docker push devatherock/slack-webhook-facade:$TAG
-  deploy:
-    executor: heroku/default
-    <<: *resource_class
-    <<: *work_directory
+          
+  publish_release:
+    executor: docker-executor
     steps:
       - checkout
-      - heroku/install
       - setup_remote_docker
       - attach_workspace:
           at: ~/slack-webhook-facade
@@ -84,24 +89,25 @@ jobs:
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
           docker pull devatherock/slack-webhook-facade:$DEV_TAG
           docker tag devatherock/slack-webhook-facade:$DEV_TAG devatherock/slack-webhook-facade:$TAG
-          docker tag devatherock/slack-webhook-facade:$TAG devatherock/slack-webhook-facade:latest
           docker push devatherock/slack-webhook-facade:$TAG
-          docker push devatherock/slack-webhook-facade:latest
-          docker tag devatherock/slack-webhook-facade:$TAG registry.heroku.com/slack-webhook-facade/web
-          heroku container:login
-          docker push registry.heroku.com/slack-webhook-facade/web
-          heroku container:release -a slack-webhook-facade web
+          
+  deploy:
+    executor: docker-executor
+    steps:
+      - run:
+          name: Trigger deployment to render.com
+          command: |
+            curl $RENDER_DEPLOY_HOOK
 
-  notify_success:
+  notify:
     <<: *slack_image
     <<: *resource_class
     environment:
       TEXT: "Success: {{.CircleBuildUrl}} by {{.CircleUsername}}"
-      COLOR: "#33ad7f"
       CHANNEL: general
       TITLE: "Build completed"
     steps:
-      - run: /bin/simpleslack
+      - run: /bin/simpleslack -c "#33ad7f" || true
 
 workflows:
   version: 2.1
@@ -118,29 +124,33 @@ workflows:
             - docker-credentials
           requires:
             - build
-      - notify_success:
+      - notify:
           context:
             - docker-credentials
             - slack-webhook
           requires:
             - publish
+            
   release:
     jobs:
+      - publish_release:
+          context:
+            - docker-credentials
+          <<: *release_filter
       - deploy:
           context:
             - docker-credentials
-            - heroku-credentials
-          filters:
-            branches:
-              only: non-existent-branch
-            tags:
-              only: /^v[0-9\.]+$/
-      - notify_success:
+          <<: *release_filter
+          requires:
+            - publish_release
+      - notify:
           context:
             - docker-credentials
             - slack-webhook
+          <<: *release_filter
           requires:
             - deploy
+            
   pr_check:
     jobs:
       - test:
