@@ -18,7 +18,7 @@ To post a slack webhook message to zulip, use the slack webhook URL in the below
 
 #### Sample URL
 ```
-https://slack-webhook-facade.herokuapp.com/zulip/Y2ktYm90QHp1bGlwY2hhdC5jb206eHl6?server=https://devatherock-chat.zulipchat.com
+https://slack-webhook-facade.onrender.com/zulip/Y2ktYm90QHp1bGlwY2hhdC5jb206eHl6?server=https://devatherock-chat.zulipchat.com
 ```
 
 #### Sample slack payload to post to the facade
