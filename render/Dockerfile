@@ -1,0 +1,1 @@
+FROM devatherock/slack-webhook-facade:0.1.0
