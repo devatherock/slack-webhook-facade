@@ -74,7 +74,9 @@ jobs:
           TAG=${CIRCLE_SHA1:0:8}
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
           docker build -t devatherock/slack-webhook-facade:$TAG docker
+          docker tag devatherock/slack-webhook-facade:$TAG devatherock/slack-webhook-facade:latest
           docker push devatherock/slack-webhook-facade:$TAG
+          docker push devatherock/slack-webhook-facade:latest
           
   publish_release:
     executor: docker-executor
