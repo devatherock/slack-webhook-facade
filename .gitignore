@@ -2,3 +2,5 @@ release/
 *.iml
 .project
 docker/slackwebhookfacade
+coverage.html
+coverage.out
