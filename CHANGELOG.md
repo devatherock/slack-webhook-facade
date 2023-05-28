@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Changed
 - Updated dockerhub readme in CI pipeline
+- Switched to `cimg/*` image from `circleci/*` image in CI pipeline
+- Set goveralls version to `v0.0.9`, to fix build failure
 
 ## [0.2.0] - 2022-11-05
 ### Added
