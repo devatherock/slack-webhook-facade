@@ -12,7 +12,7 @@ check:
 	go tool cover -html=coverage.out -o coverage.html
 coveralls:
 	go test -v -covermode=count -coverprofile=coverage.out
-	go get github.com/mattn/goveralls
+	go get github.com/mattn/goveralls@v0.0.7
 	${GOPATH}/bin/goveralls -coverprofile=coverage.out
 build:
 	go build -o docker/slackwebhookfacade main.go
