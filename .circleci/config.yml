@@ -92,6 +92,20 @@ jobs:
           docker pull devatherock/slack-webhook-facade:$DEV_TAG
           docker tag devatherock/slack-webhook-facade:$DEV_TAG devatherock/slack-webhook-facade:$TAG
           docker push devatherock/slack-webhook-facade:$TAG
+
+  dockerhub_readme:
+    machine:
+      image: ubuntu-2204:2023.04.2
+    steps:
+      - checkout
+      - run: |
+          docker run -v $PWD:/workspace \
+              -e DOCKERHUB_USERNAME \
+              -e DOCKERHUB_PASSWORD \
+              -e DOCKERHUB_REPOSITORY='devatherock/slack-webhook-facade' \
+              -e SHORT_DESCRIPTION='A Slack webhook facade to post messages to other chat clients like Zulip' \
+              -e README_FILEPATH='/workspace/README.md' \
+              peterevans/dockerhub-description:3.4.1
           
   deploy:
     executor: docker-executor
@@ -126,12 +140,18 @@ workflows:
             - docker-credentials
           requires:
             - build
+      - dockerhub_readme:
+          context:
+            - docker-credentials
+            - dockerhub-readme-credentials
+          requires:
+            - publish
       - notify:
           context:
             - docker-credentials
             - slack-webhook
           requires:
-            - publish
+            - dockerhub_readme
             
   release:
     jobs:

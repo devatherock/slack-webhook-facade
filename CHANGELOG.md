@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+### Changed
+- Updated dockerhub readme in CI pipeline
+
 ## [0.2.0] - 2022-11-05
 ### Added
 - [#2](https://github.com/devatherock/slack-webhook-facade/issues/2): Integrated sonar and coveralls
