@@ -72,7 +72,7 @@ jobs:
           at: ~/slack-webhook-facade
       - run: |
           TAG=${CIRCLE_SHA1:0:8}
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker build -t devatherock/slack-webhook-facade:$TAG docker
           docker tag devatherock/slack-webhook-facade:$TAG devatherock/slack-webhook-facade:latest
           docker push devatherock/slack-webhook-facade:$TAG
@@ -88,7 +88,7 @@ jobs:
       - run: |
           TAG=${CIRCLE_TAG#v}
           DEV_TAG=${CIRCLE_SHA1:0:8}
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker pull devatherock/slack-webhook-facade:$DEV_TAG
           docker tag devatherock/slack-webhook-facade:$DEV_TAG devatherock/slack-webhook-facade:$TAG
           docker push devatherock/slack-webhook-facade:$TAG
@@ -96,6 +96,7 @@ jobs:
   dockerhub_readme:
     machine:
       image: ubuntu-2204:2023.04.2
+      resource_class: medium
     steps:
       - checkout
       - run: |
