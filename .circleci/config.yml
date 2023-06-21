@@ -1,32 +1,41 @@
+docker_auth: &docker_auth
+  auth:
+    username: $DOCKER_USERNAME
+    password: $DOCKER_PASSWORD
+
+workspace: &workspace
+  at: ~/slack-webhook-facade
+
 slack_image: &slack_image
   docker:
-    - image: devatherock/simple-slack:0.7.0
-      auth:
-        username: $DOCKER_USERNAME
-        password: $DOCKER_PASSWORD
+    - image: devatherock/simple-slack:1.0.0
+      <<: *docker_auth
 
 work_directory: &work_directory
   working_directory: ~/slack-webhook-facade
 
 resource_class: &resource_class
   resource_class: small
-  
-executors:
-  docker-executor:
-    docker:
-    - image: cimg/go:1.14
-      auth:
-        username: $DOCKER_USERNAME
-        password: $DOCKER_PASSWORD
-    <<: *resource_class
-    <<: *work_directory
-    
+
 release_filter: &release_filter
   filters:
     branches:
       only: non-existent-branch
     tags:
-      only: /^v[0-9\.]+$/    
+      only: /^v[0-9\.]+$/
+
+parameters:
+  repo_name:
+    type: string
+    default: "slack-webhook-facade"
+
+executors:
+  docker-executor:
+    docker:
+    - image: cimg/go:1.14
+      <<: *docker_auth
+    <<: *resource_class
+    <<: *work_directory
 
 version: 2.1
 jobs:
@@ -39,7 +48,7 @@ jobs:
             - v1-pkg-cache-{{ checksum "go.mod" }}
             - v1-pkg-cache
       - run: make check
-      
+
   build:
     executor: docker-executor
     environment:
@@ -62,14 +71,14 @@ jobs:
           root: ~/slack-webhook-facade
           paths:
             - docker/slackwebhookfacade
-            
+
   publish:
     executor: docker-executor
     steps:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: ~/slack-webhook-facade
+          <<: *workspace
       - run: |
           TAG=${CIRCLE_SHA1:0:8}
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -77,14 +86,14 @@ jobs:
           docker tag devatherock/slack-webhook-facade:$TAG devatherock/slack-webhook-facade:latest
           docker push devatherock/slack-webhook-facade:$TAG
           docker push devatherock/slack-webhook-facade:latest
-          
+
   publish_release:
     executor: docker-executor
     steps:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: ~/slack-webhook-facade
+          <<: *workspace
       - run: |
           TAG=${CIRCLE_TAG#v}
           DEV_TAG=${CIRCLE_SHA1:0:8}
@@ -94,20 +103,22 @@ jobs:
           docker push devatherock/slack-webhook-facade:$TAG
 
   dockerhub_readme:
-    machine:
-      image: ubuntu-2204:2023.04.2
-      resource_class: medium
+    docker:
+      - image: peterevans/dockerhub-description:3.4.2
+        <<: *docker_auth
+    <<: *resource_class
+    <<: *work_directory
+    environment:
+      DOCKERHUB_REPOSITORY: 'devatherock/<< pipeline.parameters.repo_name >>'
+      SHORT_DESCRIPTION: 'A Slack webhook facade to post messages to other chat clients like Zulip'
+      README_FILEPATH: README.md
     steps:
       - checkout
+      - attach_workspace:
+          <<: *workspace
       - run: |
-          docker run -v $PWD:/workspace \
-              -e DOCKERHUB_USERNAME \
-              -e DOCKERHUB_PASSWORD \
-              -e DOCKERHUB_REPOSITORY='devatherock/slack-webhook-facade' \
-              -e SHORT_DESCRIPTION='A Slack webhook facade to post messages to other chat clients like Zulip' \
-              -e README_FILEPATH='/workspace/README.md' \
-              peterevans/dockerhub-description:3.4.1
-          
+          sh /entrypoint.sh
+
   deploy:
     executor: docker-executor
     steps:
@@ -153,7 +164,7 @@ workflows:
             - slack-webhook
           requires:
             - dockerhub_readme
-            
+
   release:
     jobs:
       - publish_release:
@@ -173,7 +184,7 @@ workflows:
           <<: *release_filter
           requires:
             - deploy
-            
+
   pr_check:
     jobs:
       - test:
