@@ -3,6 +3,9 @@ docker_auth: &docker_auth
     username: $DOCKER_USERNAME
     password: $DOCKER_PASSWORD
 
+orbs:
+  templates: devatherock/circleci-templates@0.1.1
+
 workspace: &workspace
   at: ~/slack-webhook-facade
 
@@ -102,23 +105,6 @@ jobs:
           docker tag devatherock/slack-webhook-facade:$DEV_TAG devatherock/slack-webhook-facade:$TAG
           docker push devatherock/slack-webhook-facade:$TAG
 
-  dockerhub_readme:
-    docker:
-      - image: peterevans/dockerhub-description:3.4.2
-        <<: *docker_auth
-    <<: *resource_class
-    <<: *work_directory
-    environment:
-      DOCKERHUB_REPOSITORY: 'devatherock/<< pipeline.parameters.repo_name >>'
-      SHORT_DESCRIPTION: 'A Slack webhook facade to post messages to other chat clients like Zulip'
-      README_FILEPATH: README.md
-    steps:
-      - checkout
-      - attach_workspace:
-          <<: *workspace
-      - run: |
-          sh /entrypoint.sh
-
   deploy:
     executor: docker-executor
     steps:
@@ -152,10 +138,14 @@ workflows:
             - docker-credentials
           requires:
             - build
-      - dockerhub_readme:
+      - templates/dockerhub_readme_update:
+          name: dockerhub_readme
           context:
             - docker-credentials
             - dockerhub-readme-credentials
+          docker_image: '<< pipeline.parameters.repo_name >>'
+          image_description: 'A Slack webhook facade to post messages to other chat clients like Zulip'
+          work_dir: '~/<< pipeline.parameters.repo_name >>'
           requires:
             - publish
       - notify:
